@@ -166,10 +166,11 @@ UTexture2D * SelectedTexture, uint32 & PinsConnectedCounter)
 {
 	UMaterialExpressionTextureSample* TextureSampleNode =
 	NewObject<UMaterialExpressionTextureSample>(CreatedMaterial);
-
+	UMaterialEditorOnlyData* EditorOnly = CreatedMaterial->GetEditorOnlyData();
+	if(!EditorOnly) return;
 	if(!TextureSampleNode) return;
 
-	if(!CreatedMaterial->BaseColor.IsConnected())
+	if(!EditorOnly->BaseColor.IsConnected())
 	{
 		if(TryConnectBaseColor(TextureSampleNode,SelectedTexture,CreatedMaterial))
 		{
@@ -178,7 +179,7 @@ UTexture2D * SelectedTexture, uint32 & PinsConnectedCounter)
 		}
 	}
 
-	if(!CreatedMaterial->Metallic.IsConnected())
+	if(!EditorOnly->Metallic.IsConnected())
 	{
 		if(TryConnectMetalic(TextureSampleNode, SelectedTexture, CreatedMaterial))
 		{
@@ -187,7 +188,7 @@ UTexture2D * SelectedTexture, uint32 & PinsConnectedCounter)
 		}
 	}
 
-	if(!CreatedMaterial->Roughness.IsConnected())
+	if(!EditorOnly->Roughness.IsConnected())
 	{
 		if(TryConnectRoughness(TextureSampleNode, SelectedTexture, CreatedMaterial))
 		{
@@ -196,7 +197,7 @@ UTexture2D * SelectedTexture, uint32 & PinsConnectedCounter)
 		}
 	}
 
-	if(!CreatedMaterial->Normal.IsConnected())
+	if(!EditorOnly->Normal.IsConnected())
 	{
 		if(TryConnectNormal(TextureSampleNode, SelectedTexture, CreatedMaterial))
 		{
@@ -205,7 +206,7 @@ UTexture2D * SelectedTexture, uint32 & PinsConnectedCounter)
 		}
 	}
 
-	if(!CreatedMaterial->AmbientOcclusion.IsConnected())
+	if(!EditorOnly->AmbientOcclusion.IsConnected())
 	{
 		if(TryConnectAO(TextureSampleNode, SelectedTexture, CreatedMaterial))
 		{
@@ -222,10 +223,11 @@ UTexture2D * SelectedTexture, uint32 & PinsConnectedCounter)
 {
 	UMaterialExpressionTextureSample* TextureSampleNode =
 	NewObject<UMaterialExpressionTextureSample>(CreatedMaterial);
-
+	UMaterialEditorOnlyData* EditorOnly = CreatedMaterial->GetEditorOnlyData();
+	if (!EditorOnly) return;
 	if(!TextureSampleNode) return;
 
-	if(!CreatedMaterial->BaseColor.IsConnected())
+	if(!EditorOnly->BaseColor.IsConnected())
 	{
 		if(TryConnectBaseColor(TextureSampleNode,SelectedTexture,CreatedMaterial))
 		{
@@ -234,7 +236,7 @@ UTexture2D * SelectedTexture, uint32 & PinsConnectedCounter)
 		}
 	}
 
-	if(!CreatedMaterial->Normal.IsConnected())
+	if(!EditorOnly->Normal.IsConnected())
 	{
 		if(TryConnectNormal(TextureSampleNode, SelectedTexture, CreatedMaterial))
 		{
@@ -243,7 +245,7 @@ UTexture2D * SelectedTexture, uint32 & PinsConnectedCounter)
 		}
 	}
 
-	if(!CreatedMaterial->Roughness.IsConnected())
+	if(!EditorOnly->Roughness.IsConnected())
 	{
 		if(TryConnectORM(TextureSampleNode, SelectedTexture, CreatedMaterial))
 		{
@@ -260,6 +262,8 @@ UTexture2D * SelectedTexture, uint32 & PinsConnectedCounter)
 bool UQuickMaterialCreationWidget::TryConnectBaseColor(UMaterialExpressionTextureSample * TextureSampleNode, 
 UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 {
+	UMaterialEditorOnlyData* EditorOnly = CreatedMaterial->GetEditorOnlyData();
+	if (!EditorOnly) return false;
 	for(const FString& BaseColorName:BaseColorArray)
 	{
 		if(SelectedTexture->GetName().Contains(BaseColorName))
@@ -267,8 +271,8 @@ UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 			//Connect pins to base color socket here
 			TextureSampleNode->Texture = SelectedTexture;
 
-			CreatedMaterial->Expressions.Add(TextureSampleNode);
-			CreatedMaterial->BaseColor.Expression = TextureSampleNode;
+			EditorOnly->ExpressionCollection.AddExpression(TextureSampleNode);
+			EditorOnly->BaseColor.Expression = TextureSampleNode;
 			CreatedMaterial->PostEditChange();
 			 
 			TextureSampleNode->MaterialExpressionEditorX -=600;
@@ -283,6 +287,8 @@ UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 bool UQuickMaterialCreationWidget::TryConnectMetalic(UMaterialExpressionTextureSample * TextureSampleNode, 
 UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 {
+	UMaterialEditorOnlyData* EditorOnly = CreatedMaterial->GetEditorOnlyData();
+	if (!EditorOnly) return false;
 	for(const FString& MetalicName:MetallicArray)
 	{
 		if(SelectedTexture->GetName().Contains(MetalicName))
@@ -294,8 +300,8 @@ UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 			TextureSampleNode->Texture = SelectedTexture;
 			TextureSampleNode->SamplerType = EMaterialSamplerType::SAMPLERTYPE_LinearColor;
 
-			CreatedMaterial->Expressions.Add(TextureSampleNode);
-			CreatedMaterial->Metallic.Expression = TextureSampleNode;
+			EditorOnly->ExpressionCollection.AddExpression(TextureSampleNode);
+			EditorOnly->Metallic.Expression = TextureSampleNode;
 			CreatedMaterial->PostEditChange();
 
 			TextureSampleNode->MaterialExpressionEditorX -=600;
@@ -310,6 +316,8 @@ UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 
 bool UQuickMaterialCreationWidget::TryConnectRoughness(UMaterialExpressionTextureSample * TextureSampleNode, UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 {
+	UMaterialEditorOnlyData* EditorOnly = CreatedMaterial->GetEditorOnlyData();
+	if (!EditorOnly) return false;
 	for(const FString& RoughnessName:RoughnessArray)
 	{
 		if(SelectedTexture->GetName().Contains(RoughnessName))
@@ -321,8 +329,8 @@ bool UQuickMaterialCreationWidget::TryConnectRoughness(UMaterialExpressionTextur
 			TextureSampleNode->Texture = SelectedTexture;
 			TextureSampleNode->SamplerType = EMaterialSamplerType::SAMPLERTYPE_LinearColor;
 
-			CreatedMaterial->Expressions.Add(TextureSampleNode);
-			CreatedMaterial->Roughness.Expression = TextureSampleNode;
+			EditorOnly->ExpressionCollection.AddExpression(TextureSampleNode);
+			EditorOnly->Roughness.Expression = TextureSampleNode;
 			CreatedMaterial->PostEditChange();
 
 			TextureSampleNode->MaterialExpressionEditorX -=600;
@@ -337,6 +345,8 @@ bool UQuickMaterialCreationWidget::TryConnectRoughness(UMaterialExpressionTextur
 
 bool UQuickMaterialCreationWidget::TryConnectNormal(UMaterialExpressionTextureSample * TextureSampleNode, UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 {
+	UMaterialEditorOnlyData* EditorOnly = CreatedMaterial->GetEditorOnlyData();
+	if (!EditorOnly) return false;
 	for(const FString& NormalName:NormalArray)
 	{	
 		if(SelectedTexture->GetName().Contains(NormalName))
@@ -344,8 +354,8 @@ bool UQuickMaterialCreationWidget::TryConnectNormal(UMaterialExpressionTextureSa
 			TextureSampleNode->Texture = SelectedTexture;
 			TextureSampleNode->SamplerType = EMaterialSamplerType::SAMPLERTYPE_Normal;
 
-			CreatedMaterial->Expressions.Add(TextureSampleNode);
-			CreatedMaterial->Normal.Expression = TextureSampleNode;
+			EditorOnly->ExpressionCollection.AddExpression(TextureSampleNode);
+			EditorOnly->Normal.Expression = TextureSampleNode;
 			CreatedMaterial->PostEditChange();
 
 			TextureSampleNode->MaterialExpressionEditorX -= 600;
@@ -360,6 +370,8 @@ bool UQuickMaterialCreationWidget::TryConnectNormal(UMaterialExpressionTextureSa
 
 bool UQuickMaterialCreationWidget::TryConnectAO(UMaterialExpressionTextureSample * TextureSampleNode, UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 {
+	UMaterialEditorOnlyData* EditorOnly = CreatedMaterial->GetEditorOnlyData();
+	if (!EditorOnly) return false;
 	for(const FString& AOName:AmbientOcclusionArray)
 	{	
 		if(SelectedTexture->GetName().Contains(AOName))
@@ -371,8 +383,8 @@ bool UQuickMaterialCreationWidget::TryConnectAO(UMaterialExpressionTextureSample
 			TextureSampleNode->Texture = SelectedTexture;
 			TextureSampleNode->SamplerType = EMaterialSamplerType::SAMPLERTYPE_LinearColor;
 
-			CreatedMaterial->Expressions.Add(TextureSampleNode);
-			CreatedMaterial->AmbientOcclusion.Expression = TextureSampleNode;
+			EditorOnly->ExpressionCollection.AddExpression(TextureSampleNode);
+			EditorOnly->AmbientOcclusion.Expression = TextureSampleNode;
 			CreatedMaterial->PostEditChange();
 
 
@@ -388,6 +400,8 @@ bool UQuickMaterialCreationWidget::TryConnectAO(UMaterialExpressionTextureSample
 
 bool UQuickMaterialCreationWidget::TryConnectORM(UMaterialExpressionTextureSample * TextureSampleNode, UTexture2D * SelectedTexture, UMaterial * CreatedMaterial)
 {	
+	UMaterialEditorOnlyData* EditorOnly = CreatedMaterial->GetEditorOnlyData();
+	if (!EditorOnly) return false;
 	for(const FString& ORM_Name:ORMArray)
 	{
 		if(SelectedTexture->GetName().Contains(ORM_Name))
@@ -399,10 +413,10 @@ bool UQuickMaterialCreationWidget::TryConnectORM(UMaterialExpressionTextureSampl
 			TextureSampleNode->Texture = SelectedTexture;
 			TextureSampleNode->SamplerType = EMaterialSamplerType::SAMPLERTYPE_Masks;
 
-			CreatedMaterial->Expressions.Add(TextureSampleNode);
-			CreatedMaterial->AmbientOcclusion.Connect(1,TextureSampleNode);
-			CreatedMaterial->Roughness.Connect(2,TextureSampleNode);
-			CreatedMaterial->Metallic.Connect(3,TextureSampleNode);
+			EditorOnly->ExpressionCollection.AddExpression(TextureSampleNode);
+			EditorOnly->AmbientOcclusion.Connect(1,TextureSampleNode);
+			EditorOnly->Roughness.Connect(2,TextureSampleNode);
+			EditorOnly->Metallic.Connect(3,TextureSampleNode);
 			CreatedMaterial->PostEditChange();
 
 			TextureSampleNode->MaterialExpressionEditorX -= 600;
